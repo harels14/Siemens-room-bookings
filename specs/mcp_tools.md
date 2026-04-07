@@ -229,6 +229,42 @@ Returns all upcoming bookings for a given user, sorted by start time.
 
 ---
 
+### 7. `reset_database`
+
+Clears all bookings from the database. Requires an admin password for authorization.  
+Rooms and features are preserved — only booking data is deleted.
+
+> Intended for demo resets. Not exposed in production.
+
+**Input**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `admin_password` | `string` | Yes | Must match the `MCP_ADMIN_PASSWORD` environment variable |
+
+**Output**
+
+```json
+{ "success": true, "message": "All bookings have been cleared (42 rows deleted)" }
+```
+
+**Errors**
+
+| Condition | Message |
+|-----------|---------|
+| Wrong password | `"Unauthorized: invalid admin password"` |
+| `MCP_ADMIN_PASSWORD` not set | `"Admin password not configured on the server"` |
+
+**Configuration**
+
+Set in `.env` at the project root (git-ignored):
+```bash
+MCP_ADMIN_PASSWORD=your-secret-here
+```
+See `.env.example` for reference. The server loads this automatically on startup via `python-dotenv`.
+
+---
+
 ## Common Conventions
 
 - All timestamps are **ISO 8601** in local time (no timezone suffix assumed to be local).
