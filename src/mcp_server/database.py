@@ -222,6 +222,20 @@ def get_bookings_by_user(
     return [dict(row) for row in rows]
 
 
+def get_all_bookings_in_range(start_time: str, end_time: str) -> list[dict]:
+    """Returns all bookings across all rooms that overlap [start_time, end_time), sorted by start_time."""
+    with get_connection() as conn:
+        rows = conn.execute("""
+            SELECT b.id, b.room_id, r.name AS room_name, r.floor,
+                   b.title, b.booked_by, b.start_time, b.end_time
+            FROM bookings b
+            JOIN rooms r ON b.room_id = r.id
+            WHERE b.start_time < ? AND b.end_time > ?
+            ORDER BY b.start_time, r.floor
+        """, [end_time, start_time]).fetchall()
+    return [dict(row) for row in rows]
+
+
 # ---------------------------------------------------------------------------
 # Admin
 # ---------------------------------------------------------------------------

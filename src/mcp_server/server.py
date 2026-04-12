@@ -21,6 +21,7 @@ from mcp_server.tools.admin import reset_database
 from mcp_server.tools.availability import check_room_availability
 from mcp_server.tools.bookings import book_room, cancel_booking, get_my_bookings
 from mcp_server.tools.rooms import get_room_details, list_available_rooms
+from mcp_server.tools.schedule import list_all_bookings
 
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
@@ -30,7 +31,8 @@ mcp = FastMCP(
         "You manage meeting room bookings. "
         "Use list_available_rooms to find free rooms, book_room to reserve one, "
         "cancel_booking to free a slot, check_room_availability to inspect a specific room, "
-        "get_room_details for full room info, and get_my_bookings to see a user's schedule. "
+        "get_room_details for full room info, get_my_bookings to see a user's schedule, "
+        "and list_all_bookings to see all bookings across every room for a given date or date range. "
         "Always confirm booking details (room, time, title) with the user before calling book_room."
     ),
 )
@@ -43,6 +45,7 @@ mcp.tool()(check_room_availability)
 mcp.tool()(get_room_details)
 mcp.tool()(get_my_bookings)
 mcp.tool()(reset_database)
+mcp.tool()(list_all_bookings)
 
 
 # --- Resource: room catalog as background context ---
