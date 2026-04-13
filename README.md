@@ -82,9 +82,56 @@ python scripts/seed_db.py
 
 ---
 
+## Docker
+
+Without Docker, Claude Code stores the absolute path to `server.py` on your machine in `~/.claude.json`. If you move the project folder, the connection breaks — and sharing with teammates requires them to install Python 3.12, create a venv, and run `pip install`.
+
+With Docker, the image contains everything (Python, code, dependencies). Claude Code just runs `docker run ...` — no paths, no local setup required. The image can also be pushed to Docker Hub and pulled by anyone on the team.
+
+### Build
+
+```bash
+docker build -t siemens-room-bookings .
+```
+
+### Run (standalone test)
+
+```bash
+# First run: seeds the DB automatically and starts the server
+docker run -i --rm -v room-bookings-data:/app/data siemens-room-bookings
+
+# Force re-seed (resets all bookings + reloads sample data)
+docker run -i --rm -e SEED_DB=1 -v room-bookings-data:/app/data siemens-room-bookings
+```
+
+The `-i` flag keeps stdin open — required because the MCP server communicates over stdio.  
+The named volume `room-bookings-data` persists the SQLite database across container restarts.
+
+### Integrate with Claude Code (Docker)
+
+```bash
+claude mcp add --scope user --transport stdio room-bookings \
+    docker run -i --rm -v room-bookings-data:/app/data siemens-room-bookings
+```
+
+Or add manually to `~/.claude/claude_code_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "room-bookings": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-v", "room-bookings-data:/app/data", "siemens-room-bookings"]
+    }
+  }
+}
+```
+
+---
+
 ## Integration
 
-### Claude Code (CLI)
+### Claude Code (CLI — local Python)
 
 ```bash
 claude mcp add --scope user --transport stdio room-bookings "c:/path/to/venv/Scripts/python" "c:/path/to/src/mcp_server/server.py"
